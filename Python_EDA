@@ -1,0 +1,174 @@
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.219143Z","iopub.execute_input":"2024-03-18T12:53:13.219552Z","iopub.status.idle":"2024-03-18T12:53:13.226622Z","shell.execute_reply.started":"2024-03-18T12:53:13.219511Z","shell.execute_reply":"2024-03-18T12:53:13.225796Z"}}
+
+import pandas as pd
+import numpy as np
+import matplotlib.pylab as plt
+import seaborn as sns
+plt.style.use('ggplot')
+pd.set_option('max_columns', 200)
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.228306Z","iopub.execute_input":"2024-03-18T12:53:13.228693Z","iopub.status.idle":"2024-03-18T12:53:13.269504Z","shell.execute_reply.started":"2024-03-18T12:53:13.228653Z","shell.execute_reply":"2024-03-18T12:53:13.268692Z"}}
+df = pd.read_csv('../input/rollercoaster-database/coaster_db.csv')
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.270894Z","iopub.execute_input":"2024-03-18T12:53:13.271299Z","iopub.status.idle":"2024-03-18T12:53:13.277608Z","shell.execute_reply.started":"2024-03-18T12:53:13.271266Z","shell.execute_reply":"2024-03-18T12:53:13.276706Z"}}
+df.shape
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.280600Z","iopub.execute_input":"2024-03-18T12:53:13.280877Z","iopub.status.idle":"2024-03-18T12:53:13.348003Z","shell.execute_reply.started":"2024-03-18T12:53:13.280843Z","shell.execute_reply":"2024-03-18T12:53:13.346660Z"}}
+df.head(5)
+
+# %% [code] {"jupyter":{"outputs_hidden":true},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.349588Z","iopub.execute_input":"2024-03-18T12:53:13.350267Z","iopub.status.idle":"2024-03-18T12:53:13.362497Z","shell.execute_reply.started":"2024-03-18T12:53:13.350209Z","shell.execute_reply":"2024-03-18T12:53:13.361221Z"}}
+df.columns
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.364569Z","iopub.execute_input":"2024-03-18T12:53:13.365538Z","iopub.status.idle":"2024-03-18T12:53:13.380085Z","shell.execute_reply.started":"2024-03-18T12:53:13.365459Z","shell.execute_reply":"2024-03-18T12:53:13.378747Z"}}
+df.dtypes
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.381763Z","iopub.execute_input":"2024-03-18T12:53:13.382052Z","iopub.status.idle":"2024-03-18T12:53:13.419464Z","shell.execute_reply.started":"2024-03-18T12:53:13.382019Z","shell.execute_reply":"2024-03-18T12:53:13.418743Z"}}
+df.describe()
+
+
+df = df[['coaster_name',
+    # 'Length', 'Speed',
+    'Location', 'Status',
+    # 'Opening date',
+    #   'Type',
+    'Manufacturer',
+#     'Height restriction', 'Model', 'Height',
+#        'Inversions', 'Lift/launch system', 'Cost', 'Trains', 'Park section',
+#        'Duration', 'Capacity', 'G-force', 'Designer', 'Max vertical angle',
+#        'Drop', 'Soft opening date', 'Fast Lane available', 'Replaced',
+#        'Track layout', 'Fastrack available', 'Soft opening date.1',
+#        'Closing date',
+#     'Opened', 
+    # 'Replaced by', 'Website',
+#        'Flash Pass Available', 'Must transfer from wheelchair', 'Theme',
+#        'Single rider line available', 'Restraint Style',
+#        'Flash Pass available', 'Acceleration', 'Restraints', 'Name',
+       'year_introduced',
+        'latitude', 'longitude',
+    'Type_Main',
+       'opening_date_clean',
+    #'speed1', 'speed2', 'speed1_value', 'speed1_unit',
+       'speed_mph', 
+    #'height_value', 'height_unit',
+    'height_ft',
+       'Inversions_clean', 'Gforce_clean']].copy()
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.420652Z","iopub.execute_input":"2024-03-18T12:53:13.421418Z","iopub.status.idle":"2024-03-18T12:53:13.430035Z","shell.execute_reply.started":"2024-03-18T12:53:13.421377Z","shell.execute_reply":"2024-03-18T12:53:13.428573Z"}}
+df['opening_date_clean'] = pd.to_datetime(df['opening_date_clean'])
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.431719Z","iopub.execute_input":"2024-03-18T12:53:13.431993Z","iopub.status.idle":"2024-03-18T12:53:13.444513Z","shell.execute_reply.started":"2024-03-18T12:53:13.431962Z","shell.execute_reply":"2024-03-18T12:53:13.443573Z"}}
+# Rename our columns
+df = df.rename(columns={'coaster_name':'Coaster_Name',
+                   'year_introduced':'Year_Introduced',
+                   'opening_date_clean':'Opening_Date',
+                   'speed_mph':'Speed_mph',
+                   'height_ft':'Height_ft',
+                   'Inversions_clean':'Inversions',
+                   'Gforce_clean':'Gforce'})
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.447701Z","iopub.execute_input":"2024-03-18T12:53:13.448881Z","iopub.status.idle":"2024-03-18T12:53:13.465515Z","shell.execute_reply.started":"2024-03-18T12:53:13.448805Z","shell.execute_reply":"2024-03-18T12:53:13.463866Z"}}
+df.isna().sum()
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.467942Z","iopub.execute_input":"2024-03-18T12:53:13.468285Z","iopub.status.idle":"2024-03-18T12:53:13.493149Z","shell.execute_reply.started":"2024-03-18T12:53:13.468248Z","shell.execute_reply":"2024-03-18T12:53:13.492221Z"}}
+df.loc[df.duplicated()]
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.494566Z","iopub.execute_input":"2024-03-18T12:53:13.495811Z","iopub.status.idle":"2024-03-18T12:53:13.524564Z","shell.execute_reply.started":"2024-03-18T12:53:13.495763Z","shell.execute_reply":"2024-03-18T12:53:13.523316Z"}}
+# Check for duplicate coaster name
+df.loc[df.duplicated(subset=['Coaster_Name'])].head(5)
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.526426Z","iopub.execute_input":"2024-03-18T12:53:13.526789Z","iopub.status.idle":"2024-03-18T12:53:13.562016Z","shell.execute_reply.started":"2024-03-18T12:53:13.526753Z","shell.execute_reply":"2024-03-18T12:53:13.559781Z"}}
+# Checking an example duplicate
+df.query('Coaster_Name == "Crystal Beach Cyclone"')
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.564470Z","iopub.execute_input":"2024-03-18T12:53:13.565090Z","iopub.status.idle":"2024-03-18T12:53:13.578530Z","shell.execute_reply.started":"2024-03-18T12:53:13.565050Z","shell.execute_reply":"2024-03-18T12:53:13.576906Z"}}
+df.columns
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.580294Z","iopub.execute_input":"2024-03-18T12:53:13.580659Z","iopub.status.idle":"2024-03-18T12:53:13.593341Z","shell.execute_reply.started":"2024-03-18T12:53:13.580617Z","shell.execute_reply":"2024-03-18T12:53:13.592234Z"}}
+df = df.loc[~df.duplicated(subset=['Coaster_Name','Location','Opening_Date'])] \
+    .reset_index(drop=True).copy()
+
+# %% [markdown]
+# # Step 3: Feature Understanding
+# (Univariate analysis)
+# 
+# - Plotting Feature Distributions
+#     - Histogram
+#     - KDE
+#     - Boxplot
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.594896Z","iopub.execute_input":"2024-03-18T12:53:13.595417Z","iopub.status.idle":"2024-03-18T12:53:13.607047Z","shell.execute_reply.started":"2024-03-18T12:53:13.595377Z","shell.execute_reply":"2024-03-18T12:53:13.605839Z"}}
+df['Year_Introduced'].value_counts()
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.609123Z","iopub.execute_input":"2024-03-18T12:53:13.609466Z","iopub.status.idle":"2024-03-18T12:53:13.926063Z","shell.execute_reply.started":"2024-03-18T12:53:13.609430Z","shell.execute_reply":"2024-03-18T12:53:13.924817Z"}}
+ax = df['Year_Introduced'].value_counts() \
+    .head(10) \
+    .plot(kind='bar', title='Top 10 Years Coasters Introduced')
+ax.set_xlabel('Year Introduced')
+ax.set_ylabel('Count')
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:13.927927Z","iopub.execute_input":"2024-03-18T12:53:13.928445Z","iopub.status.idle":"2024-03-18T12:53:14.276575Z","shell.execute_reply.started":"2024-03-18T12:53:13.928408Z","shell.execute_reply":"2024-03-18T12:53:14.275305Z"}}
+ax = df['Speed_mph'].plot(kind='hist',
+                          bins=20,
+                          title='Coaster Speed (mph)')
+ax.set_xlabel('Speed (mph)')
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:14.278292Z","iopub.execute_input":"2024-03-18T12:53:14.278613Z","iopub.status.idle":"2024-03-18T12:53:14.566928Z","shell.execute_reply.started":"2024-03-18T12:53:14.278577Z","shell.execute_reply":"2024-03-18T12:53:14.565842Z"}}
+ax = df['Speed_mph'].plot(kind='kde',
+                          title='Coaster Speed (mph)')
+ax.set_xlabel('Speed (mph)')
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:14.568386Z","iopub.execute_input":"2024-03-18T12:53:14.568820Z","iopub.status.idle":"2024-03-18T12:53:14.580056Z","shell.execute_reply.started":"2024-03-18T12:53:14.568773Z","shell.execute_reply":"2024-03-18T12:53:14.578793Z"}}
+df['Type_Main'].value_counts()
+
+# %% [markdown]
+# # Step 4: Feature Relationships
+# - Scatterplot
+# - Heatmap Correlation
+# - Pairplot
+# - Groupby comparisons
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:14.582116Z","iopub.execute_input":"2024-03-18T12:53:14.582477Z","iopub.status.idle":"2024-03-18T12:53:14.850657Z","shell.execute_reply.started":"2024-03-18T12:53:14.582429Z","shell.execute_reply":"2024-03-18T12:53:14.849237Z"}}
+df.plot(kind='scatter',
+        x='Speed_mph',
+        y='Height_ft',
+        title='Coaster Speed vs. Height')
+plt.show()
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:14.852590Z","iopub.execute_input":"2024-03-18T12:53:14.852953Z","iopub.status.idle":"2024-03-18T12:53:15.282258Z","shell.execute_reply.started":"2024-03-18T12:53:14.852907Z","shell.execute_reply":"2024-03-18T12:53:15.280878Z"}}
+ax = sns.scatterplot(x='Speed_mph',
+                y='Height_ft',
+                hue='Year_Introduced',
+                data=df)
+ax.set_title('Coaster Speed vs. Height')
+plt.show()
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:15.283905Z","iopub.execute_input":"2024-03-18T12:53:15.284196Z","iopub.status.idle":"2024-03-18T12:53:24.229035Z","shell.execute_reply.started":"2024-03-18T12:53:15.284163Z","shell.execute_reply":"2024-03-18T12:53:24.227836Z"}}
+sns.pairplot(df,
+             vars=['Year_Introduced','Speed_mph',
+                   'Height_ft','Inversions','Gforce'],
+            hue='Type_Main')
+plt.show()
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:24.230907Z","iopub.execute_input":"2024-03-18T12:53:24.231209Z","iopub.status.idle":"2024-03-18T12:53:24.253138Z","shell.execute_reply.started":"2024-03-18T12:53:24.231172Z","shell.execute_reply":"2024-03-18T12:53:24.251728Z"}}
+df_corr = df[['Year_Introduced','Speed_mph',
+    'Height_ft','Inversions','Gforce']].dropna().corr()
+df_corr
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:24.254872Z","iopub.execute_input":"2024-03-18T12:53:24.255237Z","iopub.status.idle":"2024-03-18T12:53:24.684665Z","shell.execute_reply.started":"2024-03-18T12:53:24.255193Z","shell.execute_reply":"2024-03-18T12:53:24.683539Z"}}
+sns.heatmap(df_corr, annot=True)
+
+# %% [markdown] {"execution":{"iopub.status.busy":"2021-12-31T20:08:11.029825Z","iopub.execute_input":"2021-12-31T20:08:11.030274Z","iopub.status.idle":"2021-12-31T20:08:11.035592Z","shell.execute_reply.started":"2021-12-31T20:08:11.030244Z","shell.execute_reply":"2021-12-31T20:08:11.03458Z"}}
+# # Step 5: Ask a Question about the data
+# - Try to answer a question you have about the data using a plot or statistic.
+# 
+# What are the locations with the fastest roller coasters (minimum of 10)?
+
+# %% [code] {"jupyter":{"outputs_hidden":false},"execution":{"iopub.status.busy":"2024-03-18T12:53:24.686217Z","iopub.execute_input":"2024-03-18T12:53:24.686599Z","iopub.status.idle":"2024-03-18T12:53:24.969439Z","shell.execute_reply.started":"2024-03-18T12:53:24.686553Z","shell.execute_reply":"2024-03-18T12:53:24.968428Z"}}
+ax = df.query('Location != "Other"') \
+    .groupby('Location')['Speed_mph'] \
+    .agg(['mean','count']) \
+    .query('count >= 10') \
+    .sort_values('mean')['mean'] \
+    .plot(kind='barh', figsize=(12, 5), title='Average Coast Speed by Location')
+ax.set_xlabel('Average Coaster Speed')
+plt.show()
